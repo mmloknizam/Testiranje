@@ -1,0 +1,115 @@
+import { useEffect, useState } from "react";
+import axios from "axios";
+
+function DodajNastavnikaPredmetu({ onClose, onSaved }) {
+  const [nastavnici, setNastavnici] = useState([]);
+  const [predmeti, setPredmeti] = useState([]);
+
+  const [nastavnikID, setNastavnikID] = useState("");
+  const [predmetID, setPredmetID] = useState("");
+
+  // Učitaj sve nastavnike i predmete
+  useEffect(() => {
+    axios.get("/api/nastavnik")
+      .then(res => setNastavnici(res.data))
+      .catch(err => console.error("Greška pri učitavanju nastavnika:", err));
+
+    axios.get("/api/predmet")
+      .then(res => setPredmeti(res.data))
+      .catch(err => console.error("Greška pri učitavanju predmeta:", err));
+  }, []);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!nastavnikID || !predmetID) {
+      alert("Izaberite nastavnika i predmet!");
+      return;
+    }
+
+    try {
+      await axios.post("/api/nastavnik/predmet", {
+        nastavnikID,
+        predmetID
+      });
+
+      alert("Uspešno dodato!");
+      onSaved();
+      onClose();
+    } catch (err) {
+      console.error("Greška pri dodeli nastavnika predmetu:", err);
+      alert("Došlo je do greške!");
+    }
+  };
+
+  return (
+    <div style={overlay}>
+      <div style={modal}>
+        <h3>Dodaj nastavnika predmetu</h3>
+
+        <form onSubmit={handleSubmit}>
+          <div style={{ marginBottom: "10px" }}>
+            <label>Predmet:</label>
+            <select
+              value={predmetID}
+              onChange={e => setPredmetID(e.target.value)}
+            >
+              <option value="">-- Izaberite predmet --</option>
+              {predmeti.map(p => (
+                <option key={p.predmetID} value={p.predmetID}>
+                  {p.naziv}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div style={{ marginBottom: "10px" }}>
+            <label>Nastavnik:</label>
+            <select
+              value={nastavnikID}
+              onChange={e => setNastavnikID(e.target.value)}
+            >
+              <option value="">-- Izaberite nastavnika --</option>
+              {nastavnici.map(n => (
+                <option key={n.nastavnikID} value={n.nastavnikID}>
+                  {n.ime} {n.prezime}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div style={{ marginTop: "15px" }}>
+            <button type="submit">Dodaj</button>
+            <button
+              type="button"
+              onClick={onClose}
+              style={{ marginLeft: "10px" }}
+            >
+              Otkaži
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+const overlay = {
+  position: "fixed",
+  top: 0,
+  left: 0,
+  width: "100%",
+  height: "100%",
+  background: "rgba(0,0,0,0.4)",
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center"
+};
+
+const modal = {
+  background: "#fff",
+  padding: "20px",
+  borderRadius: "10px",
+  minWidth: "300px"
+};
+
+export default DodajNastavnikaPredmetu;

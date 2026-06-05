@@ -1,0 +1,90 @@
+import { useState } from "react";
+import axios from "axios";
+
+function ObrisiNastavnikaZaPredmet({ predmeti, nastavnici, onClose, onDeleted }) {
+  const [selectedPredmet, setSelectedPredmet] = useState("");
+  const [selectedNastavnik, setSelectedNastavnik] = useState("");
+
+  const nastavniciZaPredmet = nastavnici[selectedPredmet] || [];
+
+  const handleDelete = async () => {
+    if (!selectedPredmet || !selectedNastavnik) {
+      alert("Izaberite predmet i nastavnika!");
+      return;
+    }
+
+    try {
+      await axios.delete(`/api/predmet/${selectedPredmet}/nastavnici/${selectedNastavnik}`);
+      alert("Nastavnik uspešno obrisan sa predmeta!");
+      onDeleted();
+      onClose();
+    } catch (err) {
+      console.error(err);
+      alert("Došlo je do greške prilikom brisanja nastavnika sa predmeta!");
+    }
+  };
+
+  return (
+    <div className="modal-overlay">
+      <div className="modal">
+        <h3>Obriši nastavnika sa predmeta</h3>
+
+        <div style={{ marginBottom: "10px" }}>
+          <select
+            value={selectedPredmet}
+            onChange={(e) => {
+              setSelectedPredmet(e.target.value);
+              setSelectedNastavnik("");
+            }}
+          >
+            <option value="">-- Izaberite predmet --</option>
+            {predmeti.map((p) => (
+              <option key={p.predmetID} value={p.predmetID}>
+                {p.naziv}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div style={{ marginBottom: "10px" }}>
+          <select
+            value={selectedNastavnik}
+            onChange={(e) => setSelectedNastavnik(e.target.value)}
+            disabled={!selectedPredmet || nastavniciZaPredmet.length === 0}
+          >
+            <option value="">-- Izaberite nastavnika --</option>
+            {nastavniciZaPredmet.map((n) => (
+              <option key={n.nastavnikID} value={n.nastavnikID}>
+                {n.ime} {n.prezime}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div>
+          <button onClick={handleDelete}>Obriši</button>
+          <button onClick={onClose} style={{ marginLeft: "10px" }}>
+            Otkaži
+          </button>
+        </div>
+      </div>
+
+      <style>{`
+        .modal-overlay {
+          position: fixed;
+          top:0; left:0;
+          width:100%; height:100%;
+          background: rgba(0,0,0,0.5);
+          display:flex; align-items:center; justify-content:center;
+          z-index:1000;
+        }
+        .modal {
+          background:white; padding:20px; border-radius:8px;
+          width:300px; box-shadow:0 2px 10px rgba(0,0,0,0.2);
+        }
+      `}</style>
+    </div>
+  );
+}
+
+export default ObrisiNastavnikaZaPredmet;
