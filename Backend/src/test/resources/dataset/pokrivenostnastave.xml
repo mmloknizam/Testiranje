@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dataset>
+
+    <skolskagodina skolskaGodinaID="1" godina="2025/2026"/>
+
+    <predmet predmetID="1" naziv="Napredne softverske tehnologije" brojEspb="6" fondPredavanja="30" fondVezbi="15" fondLabVezbi="10" aktivan="1"/>
+
+    <nastavnik nastavnikID="1" ime="Ilija" prezime="Antovic" zvanjeID="4"/>
+
+    <obliknastave oblikNastaveID="1" tip="Predavanja"/>
+
+    <pokrivenostnastave
+            pokrivenostNastaveID="1"
+            brojSatiNastave="4"
+            predmetID="1"
+            nastavnikID="1"
+            oblikNastaveID="1"
+            skolskaGodinaID="1"/>
+
+</dataset>
